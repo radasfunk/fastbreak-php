@@ -1,14 +1,16 @@
-<?php namespace Radasfunk\Fastbreak;
+<?php
 
-use GuzzleHttp\Client as GuzzleClient;
+namespace Radasfunk\Fastbreak;
+
+use Curl\Curl;
 use Radasfunk\Fastbreak\FastbreakException;
 
 class Client
 {
-   
+
     protected string $apiUrl;
     protected string $token;
-    protected $guzzle;
+    protected $curl;
     protected $errors;
     protected $headers = [];
     protected $body;
@@ -25,6 +27,8 @@ class Client
         $this->user = $user;
         $this->apiUrl = $apiUrl;
 
+        $this->curl = new Curl($this->apiUrl);
+
         $this->headers = [
             'Accept' => 'application/json',
             'FB-Channel' => $this->channel,
@@ -35,44 +39,19 @@ class Client
             $this->headers['FB-User'] = $this->user;
         }
 
-        $this->guzzle = new GuzzleClient([
-            'base_uri' => $this->apiUrl,
-            'http_errors' => false
-        ]);
+        $this->curl->setHeaders($this->headers);
     }
 
 
-    public function baseRequest($method, $endpoint, $data = [])
+
+    public function baseRequest($method, $endpoint, $payload = [])
     {
 
-        $defaultData = [];
+        $this->curl->{strtolower($method)}($endpoint, $payload);
 
-        $data = array_merge($defaultData, $data);
-        $payload = [
-            'headers' => [
-                'Accept' => 'application/vnd.api+json',
-                'Content-Type' => 'application/vnd.api+json',
-                'FB-Channel' => $this->channel,
-                'FB-User' => $this->user,
-                'Authorization' => 'Bearer ' . $this->token,
-            ],
-            'json' => $data
-        ];
+        $body = json_decode((string)$this->curl->response, true);
 
-        if (in_array($method, ['GET', 'DELETE'])) {
-            $payload['query'] = $data;
-        }
-
-        if (in_array($method, ['UPLOAD'])) {
-            $payload['multipart'] = $data;
-            $method = 'POST';
-        }
-        $response = $this->guzzle->request($method, $endpoint, $payload);
-
-        $body = json_decode((string)$response->getBody(), true);
-
-        $this->code = $response->getStatusCode();
-
+        $this->code = $this->curl->getHttpStatusCode();
         $this->body = $body;
         $this->errors = $this->body['errors'] ?? [];
 
@@ -85,6 +64,7 @@ class Client
 
     public function get($endpoint, $params = [])
     {
+
         return  $this->baseRequest('GET', $endpoint, $params);
     }
 
