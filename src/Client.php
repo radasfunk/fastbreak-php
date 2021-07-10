@@ -49,7 +49,7 @@ class Client
 
         $this->curl->{strtolower($method)}($endpoint, $payload);
 
-        $body = json_decode((string)$this->curl->response, true);
+        $body = json_decode($this->curl->getRawResponse(), true);
 
         $this->code = $this->curl->getHttpStatusCode();
         $this->body = $body;
