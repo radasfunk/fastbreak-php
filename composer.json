@@ -1,0 +1,42 @@
+{
+    "name": "radasfunk/fastbreak-php",
+    "description": "PHP client for FastBreak",
+    "keywords": [
+        "fastbreak"
+    ],
+    "homepage": "https://github.com/radasfunk/fastbreak-php",
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Alexander Lingris",
+            "email": "hi@lexx.gr",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.4|^8.0",
+        "guzzlehttp/guzzle": "^7.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Radasfunk\\Fastbreak\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Radasfunk\\Fastbreak\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
