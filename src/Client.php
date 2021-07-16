@@ -11,6 +11,7 @@ class Client
     protected string $apiUrl;
     protected string $token;
     protected $curl;
+    protected $code;
     protected $errors;
     protected $headers = [];
     protected $body;
@@ -27,7 +28,7 @@ class Client
         $this->user = $user;
         $this->apiUrl = $apiUrl;
 
-        $this->curl = new Curl($this->apiUrl);
+        
 
         $this->headers = [
             'Accept' => 'application/json',
@@ -39,13 +40,18 @@ class Client
             $this->headers['FB-User'] = $this->user;
         }
 
-        $this->curl->setHeaders($this->headers);
+        
     }
-
-
 
     public function baseRequest($method, $endpoint, $payload = [])
     {
+
+        $this->curl = new Curl($this->apiUrl);
+        $this->curl->setHeaders($this->headers);
+
+        $this->body = null;
+        $this->errors = null;
+        $this->code = null;
 
         $this->curl->{strtolower($method)}($endpoint, $payload);
 
@@ -58,6 +64,7 @@ class Client
         if ($this->hasErrors() && $this->withExceptions) {
             $this->throwException();
         }
+        
 
         return $this;
     }
